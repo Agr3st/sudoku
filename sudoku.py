@@ -1,6 +1,6 @@
 EMPTY_SPACE = '.'
 
-class PositionError(Exception):
+class InvalidMoveError(Exception):
     pass
 
 class Sudoku:
@@ -26,13 +26,26 @@ class Sudoku:
         """
         prints board in terminal
         """
+        print("   ", end="")
         for i in range(9):
+            print(f" {i+1} ", end="")
+            if (i+1) % 3 == 0:
+                print(" ", end="")
+        print()
+        print("   ", end="")
+        for i in range(9):
+            print(f" _ ", end="")
+            if (i + 1) % 3 == 0:
+                print(" ", end="")
+        print()
+        for i in range(9):
+            print(f"{i+1} | ", end="")
             for j in range(9):
                 print(f" {self.board[i][j]} ", end="")
                 if (j+1) % 3 == 0 and j != 8:
                     print("|", end="")
             if (i + 1) % 3 == 0 and i != 8:
-                print("\n ", end="")
+                print("\n    ", end="")
                 for _ in range(28):
                     print('-', end="")
             print()
@@ -48,7 +61,7 @@ class Sudoku:
         """
         # check if args are valid
         if not isinstance(num, int):
-            raise ValueError
+            return False
         if not all(1 <= val <= 10 for val in [r, c, num]):
             return False
 
@@ -87,5 +100,36 @@ class Sudoku:
                         return False
         return True
 
+    def add_number(self, r, c, num):
+        if not self.validate_move(r, c, num):
+            raise InvalidMoveError
+        self.board[r-1][c-1] = num
 
+    def is_empty_space(self):
+        for row in self.board:
+            if EMPTY_SPACE in row:
+                return True
+        return False
+
+    def is_win(self):
+        if not self.is_empty_space() and self.is_valid_board():
+            return True
+        return False
+
+    def game(self):
+        while True:
+            self.display()
+            print("Add number:")
+            r = int(input("row = "))
+            c = int(input("col = "))
+            num = int(input("num = "))
+            try:
+                self.add_number(r, c, num)
+            except InvalidMoveError:
+                print("Invalid arguments, try again.")
+            else:
+                if self.is_win():
+                    self.display()
+                    print("Congratulations, you did it!")
+                    break
 
