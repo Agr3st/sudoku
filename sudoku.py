@@ -132,4 +132,3 @@ class Sudoku:
                     self.display()
                     print("Congratulations, you did it!")
                     break
-
